@@ -95,7 +95,7 @@ const SortableItem = ({
 export const Canvas = () => {
   const { components, selectedId, setSelectedId, deleteComponent } = useEditorStore();
 
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: 'canvas-drop-zone',
   });
 

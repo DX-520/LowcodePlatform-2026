@@ -5,7 +5,7 @@ import { DynamicForm } from './DynamicForm';
 import {componentRegistry} from '@lowcode/components'
 
 export const RightPanel = () => {
-  const { components, selectedId, updateComponentProps, deleteComponent } = useEditorStore();
+  const { components, selectedId, updateComponentProps } = useEditorStore();
   
   const selectedComponent = useMemo(() => {
     return components.find((c) => c.id === selectedId);

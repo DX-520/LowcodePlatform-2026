@@ -1,5 +1,5 @@
 // packages/editor/src/App.tsx
-import { Layout, Button, Space, Modal } from 'antd';
+import { Layout, Button,  Modal } from 'antd';
 import { DndContext } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { LeftPanel } from './components/LeftPanel';
@@ -10,11 +10,11 @@ import { RightPanel } from './components/RightPanel';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { CanvasPreview } from './components/CanvasPreview';
-import { ExportHTML } from './components/ExportHTML'; 
+// import { ExportHTML } from './components/ExportHTML'; 
 // import {DebugPanel} from './components/DebugPanel'
 import { exportPDF } from './exportPDF';
 
-const { Header, Sider, Content, Footer } = Layout;
+const { Header, Sider, Content } = Layout;
 
 function App() {
   // 【修复】只取简化版 Store 里有的方法
