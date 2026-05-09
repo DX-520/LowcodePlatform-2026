@@ -1,0 +1,8 @@
+{
+  "framework": {
+    "name": "other",
+    "installCommand": "npm install -g pnpm && pnpm install",
+    "buildCommand": "cd packages/editor && pnpm build",
+    "outputDir": "packages/editor/dist"
+  }
+}
