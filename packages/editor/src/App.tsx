@@ -11,6 +11,8 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { CanvasPreview } from './components/CanvasPreview';
 import { ExportHTML } from './components/ExportHTML'; 
+// import {DebugPanel} from './components/DebugPanel'
+import { exportPDF } from './exportPDF';
 
 const { Header, Sider, Content, Footer } = Layout;
 
@@ -40,10 +42,9 @@ function App() {
   // 处理拖拽结束
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
     if (!over) return;
 
-     const activeId = active.id as string;
+    const activeId = active.id as string;
     const overId = over.id as string;
 
 
@@ -66,6 +67,7 @@ function App() {
           props: {},
         };
         addComponent(newComponent);
+        // console.log(newComponent)
       }
     }
   };
@@ -101,43 +103,41 @@ function App() {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <Layout style={{ height: '100vh' }}>
-        <Header style={{ background: '#fff', padding: '0 20px', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h2 style={{ margin: 0, fontSize: '18px' }}>我的低代码编辑器</h2>
-          <Space>
-            <Button onClick={undo}>撤销 (Ctrl+Z)</Button>
-            <Button onClick={redo}>重做 (Ctrl+Y)</Button>
-            <Button onClick={() => setIsPreviewModalOpen(true)}>预览</Button>
-            {/* <Button onClick={handleExportHTML}>导出HTML</Button> */}
-            <ExportHTML />
-          </Space>
+      <Layout style={{ height: '100vh'  }}>
+        <Header style={{ background: '#eee' , padding: '0 20px', borderBottom: '1px solid black', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2 style={{ margin: 0, fontSize: '18px' }}>拖拽式简历生成器</h2>
+          <Button type="primary" onClick={() => {
+            const paper = document.getElementById('resume-paper');
+            if (paper) exportPDF(paper);
+          }}>
+            导出为 PDF
+          </Button>
         </Header>
 
         <Layout>
-          <Sider width={250} theme="light">
+          <Sider width={250} style = {{background: '#eee' , borderRight: '1px solid black'}}>
             <LeftPanel />
           </Sider>
 
           <Content style={{ 
             padding: '20px', 
-            background: '#e8e8e8', 
+            background: '#eee', 
             overflow: 'auto', 
-            height: 'calc(100vh - 64px - 200px)' 
+            // height: 'calc(100vh - 64px - 200px)' 
           }}>
             <Canvas />
           </Content>
 
-          <Sider width={300} theme="light">
+          <Sider width={300} style={{ background: '#eee', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
              <RightPanel />
           </Sider>
         </Layout>
 
-        <Footer style={{ background: '#141414', padding: '10px 20px', height: '200px', overflow: 'auto' }}>
+        {/* <Footer style={{ background: '#141414', padding: '10px 20px', height: '200px', overflow: 'auto' }}>
           <h4 style={{ color: '#fff', marginBottom: '10px' }}>Schema JSON (调试用):</h4>
-          <pre style={{ color: '#52c41a', fontSize: '12px', margin: 0 }}>
-            {JSON.stringify(components, null, 2)}
-          </pre>
-        </Footer>
+          
+          <DebugPanel/>
+        </Footer> */}
 
         {/* 【修复】预览逻辑直接写在这里，不引用单独的 CanvasPreview 文件 */}
         <Modal

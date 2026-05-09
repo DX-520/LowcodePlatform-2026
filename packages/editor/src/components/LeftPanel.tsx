@@ -4,18 +4,19 @@ import { CSS } from '@dnd-kit/utilities';
 import { Button } from 'antd';
 import type { ComponentType } from '@lowcode/types';
 
-// 左侧可拖拽的组件列表
+// 左侧可拖拽的组件列表（仅保留简历相关组件）
 const componentList = [
-  { type: 'Button' as ComponentType, label: '按钮组件' },
-  { type: 'Input' as ComponentType, label: '输入框组件' },
-  { type: 'Text' as ComponentType, label: '段落文本' },
-  { type: 'Image' as ComponentType, label: '图片组件' },
+  { type: 'PersonalInfo' as ComponentType, label: '个人信息组件' },
+  { type: 'SkillStack' as ComponentType, label: '核心技术栈' },
+  { type: 'Internship' as ComponentType, label: '实习经历' },
+  { type: 'Project' as ComponentType, label: '项目经历' },
+  { type: 'SelfEvaluation' as ComponentType, label: '自我评价' },
 ];
 
 // 主组件
 export const LeftPanel = () => {
   return (
-    <div style={{ padding: '20px', background: '#f5f5f5', height: '100%' }}>
+    <div style={{ padding: '20px',  height: '100%' }}>
       <h3>组件库</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {componentList.map((item) => (
@@ -47,6 +48,7 @@ const DraggableItem = ({ type, label }: DraggableItemProps) => {
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
       <Button type="dashed" block>{label}</Button>
+      {/* {label} */}
     </div>
   );
 };

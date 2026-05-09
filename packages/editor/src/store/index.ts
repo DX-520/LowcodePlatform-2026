@@ -11,13 +11,34 @@ interface HistoryState {
   future: ComponentSchema[][]; // 未来的状态（用于重做）
 }
 
+// 保存到本地
+const saveToLocalStorage = (components: ComponentSchema[]) => {
+  try {
+    localStorage.setItem('resume-data', JSON.stringify(components));
+  } catch (e) {
+    console.warn('保存到本地失败', e);
+  }
+};
 
-export const useEditorStore = create<EditorState  & HistoryState>((set, get) => ({
+// 从本地读取
+const loadFromLocalStorage = (): ComponentSchema[] => {
+  try {
+    const data = localStorage.getItem('resume-data');
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    console.warn('读取本地数据失败', e);
+    return [];
+  }
+};
+export const useEditorStore = create<EditorState  & HistoryState>((set, get) => ({ //这个箭头函数没看懂
   // 初始数据
-  components: [],
+  components: loadFromLocalStorage(),
   selectedId: null,
-   past: [], // 历史栈
-  future: [], // 未来栈
+  
+  // 历史
+  past: [],
+  // 未来
+  future: [],
 
 
   // 【核心】把当前状态推入历史栈的辅助函数
@@ -29,43 +50,50 @@ export const useEditorStore = create<EditorState  & HistoryState>((set, get) => 
     });
   },
 
-  // 撤销
-  undo: () => {
-    const { past, components } = get();
-    if (past.length === 0) return;
+  // // 撤销
+  // undo: () => {
+  //   const { past, components } = get();
+  //   if (past.length === 0) return;
 
-    const previous = past[past.length - 1];
-    const newPast = past.slice(0, past.length - 1);
+  //   const previous = past[past.length - 1];
+  //   const newPast = past.slice(0, past.length - 1);
 
-    set({
-      components: previous,
-      past: newPast,
-      future: [components, ...get().future],
-      selectedId: null,
-    });
-  },
+  //   set({
+  //     components: previous,
+  //     past: newPast,
+  //     future: [components, ...get().future],
+  //     selectedId: null,
+  //   });
+  // },
 
-  // 重做
-  redo: () => {
-    const { future, components } = get();
-    if (future.length === 0) return;
+  // // 重做
+  // redo: () => {
+  //   const { future, components } = get();
+  //   if (future.length === 0) return;
 
-    const next = future[0];
-    const newFuture = future.slice(1);
+  //   const next = future[0];
+  //   const newFuture = future.slice(1);
 
-    set({
-      components: next,
-      past: [...get().past, components],
-      future: newFuture,
-      selectedId: null,
-    });
-  },
+  //   set({
+  //     components: next,
+  //     past: [...get().past, components],
+  //     future: newFuture,
+  //     selectedId: null,
+  //   });
+  // },
   // 1. 新增组件
   addComponent: (component) => {
-     get().pushHistory(); // 【新增】操作前先记录历史
-    set((state) => ({
-      components: [...state.components, component]
+    //  get().pushHistory(); // 【新增】操作前先记录历史
+    const {components:currentComponents} = get () //这一步看不懂
+    set((state) => ({ //又是这样的箭头函数，看不懂啊
+      // components: [...state.components, component]
+      past:[...state.past,[...currentComponents]],//这一步不知道何意为
+      future:[]
     }));
+    set ((state) => ({
+      components:[...state.components,component]
+    }))
+    saveToLocalStorage(get().components);
   },
 
   // 2. 设置选中的组件
@@ -75,31 +103,82 @@ export const useEditorStore = create<EditorState  & HistoryState>((set, get) => 
 
   // 3. 修改组件的属性
   updateComponentProps: (id, props) => {
-     get().pushHistory(); // 【新增】操作前先记录历史
+    //  get().pushHistory(); // 【新增】操作前先记录历史
+    const {components:currentComponents} = get () 
+    set((state) => ({ 
+      past:[...state.past,[...currentComponents]],
+      future:[]
+    }));
+
     set((state) => ({
       components: state.components.map((comp) => {
         if (comp.id === id) {
+          // 这一行真的看不懂
           return { ...comp, props: { ...comp.props, ...props } };
         }
         return comp;
       })
     }));
+    saveToLocalStorage(get().components);
   },
 
   // 4. 删除组件
   deleteComponent: (id) => {
-     get().pushHistory(); // 【新增】操作前先记录历史
+    //  get().pushHistory(); // 【新增】操作前先记录历史
+    const {components:currentComponents} = get () 
+    set((state) => ({ 
+      past:[...state.past,[...currentComponents]],
+      future:[]
+    }));
     set((state) => ({
       components: state.components.filter((comp) => comp.id !== id),
       selectedId: state.selectedId === id ? null : state.selectedId,
     }));
+    saveToLocalStorage(get().components);
+  },
+
+  // 撤销
+  undo: ()=>{
+    const {past ,components:currentComponents} = get()
+    if(past.length === 0) return
+    const previous = past[past.length - 1]
+    const newPast = past.slice(0,past.length-1)
+    set({
+      components:previous,
+      past : newPast,
+      future : [currentComponents,...get().future],
+      selectedId : null
+    })
+    saveToLocalStorage(get().components);
+  },
+
+  // 重做
+  redo: ()=>{
+    const {future, components: currentComponents} = get()
+    if (future.length === 0) return 
+    const next = future[0]
+    const newFuture = future.slice(1)
+    
+    set({
+      components:next,
+      past: [...get().past, currentComponents],
+      future: newFuture,
+      selectedId: null
+    })
+    saveToLocalStorage(get().components);
   },
 
   // 5. 排序  
    reorderComponents: (oldIndex: number, newIndex: number) => {
-    get().pushHistory(); // 排序也要记录历史，支持撤销
+    // get().pushHistory(); // 排序也要记录历史，支持撤销
+      const {components:currentComponents} = get () 
+    set((state) => ({ 
+      past:[...state.past,[...currentComponents]],
+      future:[]
+    }));
     set((state) => ({
       components: arrayMove(state.components, oldIndex, newIndex),
     }));
+    saveToLocalStorage(get().components);
   },
 }));
