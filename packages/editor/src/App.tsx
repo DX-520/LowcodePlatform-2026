@@ -148,23 +148,6 @@ function App() {
           width={800}
           style={{ top: 20 }}
         >
-          {/* <div style={{ padding: '20px', minHeight: '400px' }}>
-            {components.map((comp) => {
-              if (comp.type === 'Button') {
-                return <div key={comp.id} style={{ marginBottom: '16px' }}><button style={{ padding: '8px 16px' }}>{comp.props.children || '按钮'}</button></div>;
-              }
-              if (comp.type === 'Input') {
-                return <div key={comp.id} style={{ marginBottom: '16px' }}><input placeholder={comp.props.placeholder || '输入框'} style={{ padding: '8px', width: '200px' }} /></div>;
-              }
-              if (comp.type === 'Text') {
-                return <div key={comp.id} style={{ marginBottom: '16px' }}><p>{comp.props.content || '这是一段文本'}</p></div>;
-              }
-              if (comp.type === 'Image') {
-                return <div key={comp.id} style={{ marginBottom: '16px' }}><img src={comp.props.src || 'https://via.placeholder.com/200'} alt="预览" style={{ maxWidth: '300px' }} /></div>;
-              }
-              return null;
-            })}
-          </div> */}
           <CanvasPreview />
         </Modal>
       </Layout>
