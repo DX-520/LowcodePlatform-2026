@@ -3,7 +3,6 @@ import { create } from 'zustand';
 import type { EditorState, ComponentSchema } from '@lowcode/types';
 import { arrayMove } from '@dnd-kit/sortable';
 
-
 // 撤销功能
 
 interface HistoryState {
@@ -40,7 +39,6 @@ export const useEditorStore = create<EditorState  & HistoryState>((set, get) => 
   // 未来
   future: [],
 
-
   // 【核心】把当前状态推入历史栈的辅助函数
   pushHistory: () => {
     const { components, past } = get();
@@ -50,46 +48,9 @@ export const useEditorStore = create<EditorState  & HistoryState>((set, get) => 
     });
   },
 
-  // // 撤销
-  // undo: () => {
-  //   const { past, components } = get();
-  //   if (past.length === 0) return;
-
-  //   const previous = past[past.length - 1];
-  //   const newPast = past.slice(0, past.length - 1);
-
-  //   set({
-  //     components: previous,
-  //     past: newPast,
-  //     future: [components, ...get().future],
-  //     selectedId: null,
-  //   });
-  // },
-
-  // // 重做
-  // redo: () => {
-  //   const { future, components } = get();
-  //   if (future.length === 0) return;
-
-  //   const next = future[0];
-  //   const newFuture = future.slice(1);
-
-  //   set({
-  //     components: next,
-  //     past: [...get().past, components],
-  //     future: newFuture,
-  //     selectedId: null,
-  //   });
-  // },
   // 1. 新增组件
   addComponent: (component) => {
-    //  get().pushHistory(); // 【新增】操作前先记录历史
-    const {components:currentComponents} = get () //这一步看不懂
-    set((state) => ({ //又是这样的箭头函数，看不懂啊
-      // components: [...state.components, component]
-      past:[...state.past,[...currentComponents]],//这一步不知道何意为
-      future:[]
-    }));
+     get().pushHistory(); // 【新增】操作前先记录历史
     set ((state) => ({
       components:[...state.components,component]
     }))
@@ -103,13 +64,7 @@ export const useEditorStore = create<EditorState  & HistoryState>((set, get) => 
 
   // 3. 修改组件的属性
   updateComponentProps: (id, props) => {
-    //  get().pushHistory(); // 【新增】操作前先记录历史
-    const {components:currentComponents} = get () 
-    set((state) => ({ 
-      past:[...state.past,[...currentComponents]],
-      future:[]
-    }));
-
+    get().pushHistory(); // 【新增】操作前先记录历史
     set((state) => ({
       components: state.components.map((comp) => {
         if (comp.id === id) {
@@ -124,12 +79,7 @@ export const useEditorStore = create<EditorState  & HistoryState>((set, get) => 
 
   // 4. 删除组件
   deleteComponent: (id) => {
-    //  get().pushHistory(); // 【新增】操作前先记录历史
-    const {components:currentComponents} = get () 
-    set((state) => ({ 
-      past:[...state.past,[...currentComponents]],
-      future:[]
-    }));
+    get().pushHistory(); // 【新增】操作前先记录历史
     set((state) => ({
       components: state.components.filter((comp) => comp.id !== id),
       selectedId: state.selectedId === id ? null : state.selectedId,
@@ -170,12 +120,7 @@ export const useEditorStore = create<EditorState  & HistoryState>((set, get) => 
 
   // 5. 排序  
    reorderComponents: (oldIndex: number, newIndex: number) => {
-    // get().pushHistory(); // 排序也要记录历史，支持撤销
-      const {components:currentComponents} = get () 
-    set((state) => ({ 
-      past:[...state.past,[...currentComponents]],
-      future:[]
-    }));
+    get().pushHistory(); // 排序也要记录历史，支持撤销
     set((state) => ({
       components: arrayMove(state.components, oldIndex, newIndex),
     }));
